@@ -1,18 +1,18 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct Delivery {
+struct Delivery {
     name: String,
     phone: String,
     zip: String,
     city: String,
     address: String,
     region: String,
-    email: String,
+    email: String
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct Payment {
+struct Payment {
     transaction: String,
     request_id: String,
     currency: String,
@@ -22,11 +22,11 @@ pub struct Payment {
     bank: String,
     delivery_cost: u32,
     goods_total: u32,
-    custom_fee: u32,
+    custom_fee: u32
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct Item {
+struct Item {
     chrt_id: u32,
     track_number: String,
     price: u32,
@@ -37,11 +37,11 @@ pub struct Item {
     total_price: u32,
     nm_id: u32,
     brand: String,
-    status: u32,
+    status: u32
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct Order {
+struct Order {
     order_uid: String,
     track_number: String,
     entry: String,
