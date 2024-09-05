@@ -1,15 +1,10 @@
-use std::io::Error;
-use std::mem::forget;
-use redis::{Commands, Connection, RedisError, RedisResult};
+use redis::{Commands, Connection, RedisResult};
 
 pub struct RedisDB {
     connection: Connection,
 }
 
-pub fn connect_to_redis(
-    host: &str,
-    port: &str
-) -> Result<RedisDB, RedisError>{
+pub fn connect_to_redis(host: &str, port: &str) -> RedisResult<RedisDB> {
     let client = redis::Client::open(format!("redis://{}:{}/", host, port))?;
     let connection = client.get_connection()?;
 

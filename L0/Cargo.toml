@@ -3,6 +3,8 @@ name = "L0"
 version = "0.1.0"
 edition = "2021"
 
+default-run="L0"
+
 [dependencies]
 serde_json = "1.0.127"
 serde = { version = "1.0.209", features = ["derive"] }
@@ -10,3 +12,5 @@ tokio-postgres = "0.7.11"
 tokio = { version = "1.40.0", features = ["rt", "rt-multi-thread", "macros"] }
 log = "0.4.22"
 redis = "0.26.1"
+dotenv = "0.15.0"
+

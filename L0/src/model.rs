@@ -8,7 +8,7 @@ struct Delivery {
     city: String,
     address: String,
     region: String,
-    email: String
+    email: String,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -22,7 +22,7 @@ struct Payment {
     bank: String,
     delivery_cost: u32,
     goods_total: u32,
-    custom_fee: u32
+    custom_fee: u32,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -37,7 +37,7 @@ struct Item {
     total_price: u32,
     nm_id: u32,
     brand: String,
-    status: u32
+    status: u32,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
