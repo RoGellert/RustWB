@@ -1,3 +1,4 @@
+-- Файл с запросами SQL, собранными в одном месте
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE TABLE orders (
@@ -27,8 +28,9 @@ CREATE TABLE deliveries (
     email VARCHAR
 );
 
-CREATE TABLE transactions (
-     transaction_uid UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+CREATE TABLE payments (
+     payment_uid UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+     transaction_uid UUID,
      order_uid UUID REFERENCES orders(order_uid),
      request_id VARCHAR,
      currency VARCHAR,

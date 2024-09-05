@@ -1,6 +1,6 @@
+use dotenv::dotenv;
 use log::error;
 use std::env;
-use dotenv::dotenv;
 use tokio_postgres::NoTls;
 
 #[tokio::main]
@@ -23,8 +23,8 @@ async fn main() {
         ),
         NoTls,
     )
-        .await
-        .unwrap();
+    .await
+    .unwrap();
 
     tokio::spawn(async move {
         if let Err(e) = connection.await {
@@ -32,37 +32,13 @@ async fn main() {
         }
     });
 
-    client
-        .query(
-            "DROP TABLE deliveries;",
-            &[],
-        )
-        .await
-        .unwrap();
+    client.query("DROP TABLE deliveries;", &[]).await.unwrap();
 
-    client
-        .query(
-            "DROP TABLE transactions;",
-            &[],
-        )
-        .await
-        .unwrap();
+    client.query("DROP TABLE payments;", &[]).await.unwrap();
 
-    client
-        .query(
-            "DROP TABLE items;",
-            &[],
-        )
-        .await
-        .unwrap();
+    client.query("DROP TABLE items;", &[]).await.unwrap();
 
-    client
-        .query(
-            "DROP TABLE orders;",
-            &[],
-        )
-        .await
-        .unwrap();
+    client.query("DROP TABLE orders;", &[]).await.unwrap();
 
     client
         .query(r#"DROP EXTENSION "uuid-ossp";"#, &[])

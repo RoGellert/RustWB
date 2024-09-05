@@ -1,59 +1,60 @@
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
 #[derive(Debug, Deserialize, Serialize)]
-struct Delivery {
-    name: String,
-    phone: String,
-    zip: String,
-    city: String,
-    address: String,
-    region: String,
-    email: String,
+pub struct Delivery {
+    pub name: String,
+    pub phone: String,
+    pub zip: String,
+    pub city: String,
+    pub address: String,
+    pub region: String,
+    pub email: String,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-struct Payment {
-    transaction: String,
-    request_id: String,
-    currency: String,
-    provider: String,
-    amount: u32,
-    payment_dt: u32,
-    bank: String,
-    delivery_cost: u32,
-    goods_total: u32,
-    custom_fee: u32,
+pub struct Payment {
+    pub transaction: String,
+    pub request_id: String,
+    pub currency: String,
+    pub provider: String,
+    pub amount: u32,
+    pub payment_dt: u32,
+    pub bank: String,
+    pub delivery_cost: u32,
+    pub goods_total: u32,
+    pub custom_fee: u32,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-struct Item {
-    chrt_id: u32,
-    track_number: String,
-    price: u32,
-    rid: String,
-    name: String,
-    sale: u32,
-    size: String,
-    total_price: u32,
-    nm_id: u32,
-    brand: String,
-    status: u32,
+pub struct Item {
+    pub chrt_id: u32,
+    pub track_number: String,
+    pub price: u32,
+    pub rid: String,
+    pub name: String,
+    pub sale: u32,
+    pub size: String,
+    pub total_price: u32,
+    pub nm_id: u32,
+    pub brand: String,
+    pub status: u32,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-struct Order {
-    order_uid: String,
-    track_number: String,
-    entry: String,
-    delivery: Delivery,
-    payment: Payment,
-    items: Vec<Item>,
-    locale: String,
-    internal_signature: String,
-    customer_id: String,
-    delivery_service: String,
-    shardkey: String,
-    sm_id: u32,
-    date_created: String,
-    oof_shard: String,
+pub struct Order {
+    pub order_uid: Uuid,
+    pub track_number: String,
+    pub entry: String,
+    pub delivery: Delivery,
+    pub payment: Payment,
+    pub items: Vec<Item>,
+    pub locale: String,
+    pub internal_signature: String,
+    pub customer_id: String,
+    pub delivery_service: String,
+    pub shardkey: String,
+    pub sm_id: i32,
+    pub date_created: String,
+    pub oof_shard: String,
 }

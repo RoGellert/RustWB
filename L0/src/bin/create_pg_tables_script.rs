@@ -1,6 +1,6 @@
+use dotenv::dotenv;
 use log::error;
 use std::env;
-use dotenv::dotenv;
 use tokio_postgres::NoTls;
 
 #[tokio::main]
@@ -62,7 +62,7 @@ async fn main() {
         .query(
             "CREATE TABLE deliveries (
                     delivery_uid UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-                    order_uid UUID REFERENCES orders(order_uid),
+                    order_uid UUID UNIQUE REFERENCES orders(order_uid),
                     name VARCHAR,
                     phone VARCHAR,
                     zip VARCHAR,
@@ -78,9 +78,10 @@ async fn main() {
 
     client
         .query(
-            "CREATE TABLE transactions (
-                     transaction_uid UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-                     order_uid UUID REFERENCES orders(order_uid),
+            "CREATE TABLE payments (
+                     payment_uid UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+                     transaction_uid UUID,
+                     order_uid UUID UNIQUE REFERENCES orders(order_uid),
                      request_id VARCHAR,
                      currency VARCHAR,
                      provider VARCHAR,

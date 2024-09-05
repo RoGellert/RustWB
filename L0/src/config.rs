@@ -36,3 +36,9 @@ impl DbConfig {
         }
     }
 }
+
+impl Default for DbConfig {
+    fn default() -> Self {
+        Self::new()
+    }
+}

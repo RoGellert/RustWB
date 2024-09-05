@@ -1,31 +1,33 @@
-use redis::{Commands, Connection, RedisResult};
+// use crate::config::DbConfig;
+// use std::sync::{Arc, Mutex};
+// use redis::{AsyncCommands, Client, RedisResult};
+//
+// pub struct RedisDB {
+//     client: Client,
+// }
+//
+// impl RedisDB {
+//     pub fn new(db_config: &DbConfig) -> RedisResult<RedisDB> {
+//         let client = Client::open(format!("redis://{}:{}/", db_config.redis_host, db_config.redis_port))?;
+//
+//         Ok(Self {
+//             client,
+//         })
+//     }
 
-pub struct RedisDB {
-    connection: Connection,
-}
-
-pub fn connect_to_redis(host: &str, port: &str) -> RedisResult<RedisDB> {
-    let client = redis::Client::open(format!("redis://{}:{}/", host, port))?;
-    let connection = client.get_connection()?;
-
-    let redis_instance = RedisDB { connection };
-
-    Ok(redis_instance)
-}
-
-impl RedisDB {
-    pub fn set(&mut self, key: &str, value: &str) -> RedisResult<()> {
-        self.connection.set(key, value)?;
-        Ok(())
-    }
-
-    pub fn get(&mut self, key: &str) -> RedisResult<Option<String>> {
-        let data = self.connection.get(key)?;
-        Ok(data)
-    }
-
-    pub fn del(&mut self, key: &str) -> RedisResult<()> {
-        self.connection.del(key)?;
-        Ok(())
-    }
-}
+// pub fn set(&mut self, key: &str, value: &str) -> RedisResult<()> {
+//     let con =
+//     self.connection.set(key, value)?;
+//     Ok(())
+// }
+//
+// pub fn get(&mut self, key: &str) -> RedisResult<Option<String>> {
+//     let data = self.connection.get(key)?;
+//     Ok(data)
+// }
+//
+// pub fn del(&mut self, key: &str) -> RedisResult<()> {
+//     self.connection.del(key)?;
+//     Ok(())
+// }
+// }
