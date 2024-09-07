@@ -1,3 +1,4 @@
+use std::ptr::replace;
 use crate::config::DbConfig;
 use crate::model::{Delivery, Item, Order, Payment};
 use deadpool_postgres::{
@@ -219,7 +220,7 @@ impl PostgresDB {
         let client = self.pool.get().await?;
 
         let statement = "
-                    SELECT json_agg(result)
+                    SELECT json_agg(result)::text
                     FROM (
                         SELECT
                             orders.order_uid,
@@ -287,8 +288,9 @@ impl PostgresDB {
 
         for row in rows {
             let orders_json: String = row.get(0);
-            println!("{:?}", &orders_json);
-            let order: Order = serde_json::from_str(&orders_json)?;
+            let order_json_processed = orders_json.replace(r#"\"#, r#""#);
+            println!("{:?}", &order_json_processed);
+            let order: Order = serde_json::from_str(&order_json_processed)?;
             println!("{:?}", &order);
         }
 
