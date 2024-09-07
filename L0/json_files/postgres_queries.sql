@@ -59,20 +59,7 @@ CREATE TABLE items (
     status integer
 );
 
-
-chrt_id integer,
-    track_number VARCHAR,
-    price integer,
-    rid VARCHAR,
-    name VARCHAR,
-    sale integer,
-    size VARCHAR,
-    total_price integer,
-    nm_id integer,
-    brand VARCHAR,
-    status integer
-
-SELECT json_agg(result)::text
+SELECT json_agg(result) as order_json
 FROM (
     SELECT
         orders.order_uid,
