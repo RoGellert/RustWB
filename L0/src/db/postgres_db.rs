@@ -1,9 +1,8 @@
 use crate::config::DbConfig;
-use crate::model::{Delivery, Order};
-use deadpool_postgres::{
-    Config as DeadpoolConfig, CreatePoolError, ManagerConfig, Pool, RecyclingMethod, Runtime, PoolConfig
-};
-use tokio_postgres::NoTls;
+use crate::model::{Delivery, Item, Order, Payment};
+use deadpool_postgres::{Config as DeadpoolConfig, CreatePoolError, GenericClient, ManagerConfig, Pool, RecyclingMethod, Runtime};
+use serde_json::map::Values;
+use tokio_postgres::{NoTls};
 use uuid::Uuid;
 
 pub struct PostgresDB {
@@ -72,10 +71,14 @@ impl PostgresDB {
             )
             .await?;
 
+        self.insert_delivery(&order.delivery, &order.order_uid).await?;
+        self.insert_payment(&order.payment, &order.order_uid).await?;
+        self.insert_items(&order.items, &order.order_uid).await?;
+
         Ok(())
     }
 
-    pub async fn insert_delivery(
+    async fn insert_delivery(
         &self,
         delivery: &Delivery,
         order_uid: &Uuid,
@@ -114,18 +117,117 @@ impl PostgresDB {
         Ok(())
     }
 
+    async fn insert_payment(
+        &self,
+        payment: &Payment,
+        order_uid: &Uuid,
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        let client = self.pool.get().await?;
+
+        let statement = "
+            INSERT INTO payments
+            (transaction,
+            request_id,
+            currency,
+            provider,
+            amount,
+            payment_dt,
+            bank,
+            delivery_cost,
+            goods_total,
+            custom_fee,
+            order_uid)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);
+        ";
+
+        client
+            .query(
+                statement,
+                &[
+                    &payment.transaction,
+                    &payment.request_id,
+                    &payment.currency,
+                    &payment.provider,
+                    &payment.amount,
+                    &payment.payment_dt,
+                    &payment.bank,
+                    &payment.delivery_cost,
+                    &payment.goods_total,
+                    &payment.custom_fee,
+                    order_uid,
+                ],
+            )
+            .await?;
+
+        Ok(())
+    }
+
+    async fn insert_items(
+        &self,
+        items: &[Item],
+        order_uid: &Uuid,
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        let client = self.pool.get().await?;
+
+        let statement = "
+            INSERT INTO items
+            (chrt_id,
+            track_number,
+            price,
+            rid,
+            name,
+            sale,
+            size,
+            total_price,
+            nm_id,
+            brand,
+            status,
+            order_uid)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12);
+        ";
+
+        for item in items.iter() {
+            client
+                .query(
+                    statement,
+                    &[
+                        &item.chrt_id,
+                        &item.track_number,
+                        &item.price,
+                        &item.rid,
+                        &item.name,
+                        &item.sale,
+                        &item.size,
+                        &item.total_price,
+                        &item.nm_id,
+                        &item.brand,
+                        &item.status,
+                        order_uid,
+                    ],
+                )
+                .await?;
+        }
+
+        Ok(())
+    }
+
     pub async fn get_all_orders(&self) -> Result<(), Box<dyn std::error::Error>> {
         let client = self.pool.get().await?;
 
         let statement = "
-            SELECT * FROM orders;
+            SELECT json_agg(orders) FROM orders
         ";
 
-        let rows = client.query_one(statement, &[]).await?;
+        // INNER JOIN deliveries on deliveries.order_uid = orders.order_uid
+        // INNER JOIN payments on payments.order_uid = orders.order_uid
+        // INNER JOIN items on items.order_uid = orders.order_uid;
 
-        let order_uid: Uuid = rows.get("order_uid");
+        let rows= client.query(statement, &[]).await?;
 
-        println!("{:?}", &order_uid);
+        for row in rows {
+            let orders_json: String = row.get("items");
+            println!("{:?}", &row.get("items"));
+        }
 
         Ok(())
     }

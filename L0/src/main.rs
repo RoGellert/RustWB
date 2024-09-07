@@ -10,12 +10,13 @@ use crate::db::postgres_db::PostgresDB;
 use crate::model::Order;
 use std::fs::File;
 use std::io::Read;
+use std::sync::Arc;
 
 #[tokio::main]
 async fn main() {
     let db_config = DbConfig::new();
 
-    let postgres_instance: PostgresDB = PostgresDB::new(&db_config).await.unwrap();
+    let postgres_instance: Arc<PostgresDB> = Arc::new(PostgresDB::new(&db_config).await.unwrap());
 
     let mut file = File::open("json_files/model.json").unwrap();
     let mut contents = String::new();
@@ -24,6 +25,5 @@ async fn main() {
     let order: Order = serde_json::from_str(&contents).unwrap();
 
     postgres_instance.insert_order(&order).await.unwrap();
-    postgres_instance.insert_delivery(&order.delivery, &order.order_uid).await.unwrap();
     postgres_instance.get_all_orders().await.unwrap();
 }

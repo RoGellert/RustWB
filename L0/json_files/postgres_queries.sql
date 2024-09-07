@@ -12,7 +12,7 @@ CREATE TABLE orders (
     delivery_service VARCHAR,
     shardkey VARCHAR,
     sm_id integer,
-    date_created VARCHAR,
+    date_created TIMESTAMP,
     oof_shard VARCHAR
 );
 
@@ -30,8 +30,8 @@ CREATE TABLE deliveries (
 
 CREATE TABLE payments (
      payment_uid UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-     transaction_uid UUID,
      order_uid UUID REFERENCES orders(order_uid),
+     transaction_uid UUID,
      request_id VARCHAR,
      currency VARCHAR,
      provider VARCHAR,

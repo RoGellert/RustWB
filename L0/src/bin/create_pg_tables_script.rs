@@ -50,7 +50,7 @@ async fn main() {
                         delivery_service VARCHAR,
                         shardkey VARCHAR,
                         sm_id integer,
-                        date_created VARCHAR,
+                        date_created TIMESTAMP,
                         oof_shard VARCHAR
                     );",
             &[],
@@ -80,7 +80,7 @@ async fn main() {
         .query(
             "CREATE TABLE payments (
                      payment_uid UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-                     transaction_uid UUID,
+                     transaction VARCHAR,
                      order_uid UUID UNIQUE REFERENCES orders(order_uid),
                      request_id VARCHAR,
                      currency VARCHAR,

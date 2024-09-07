@@ -36,6 +36,19 @@
       "nm_id": 2389212,
       "brand": "Vivienne Sabo",
       "status": 202
+    },
+    {
+      "chrt_id": 9934931,
+      "track_number": "WBILMTESTTRACK",
+      "price": 4213,
+      "rid": "ab4219087a764ae0btest",
+      "name": "Mascaras",
+      "sale": 33,
+      "size": "1",
+      "total_price": 318,
+      "nm_id": 2389212,
+      "brand": "Vivienne Sabo",
+      "status": 202
     }
   ],
   "locale": "en",
@@ -44,6 +57,6 @@
   "delivery_service": "meest",
   "shardkey": "9",
   "sm_id": 99,
-  "date_created": "2021-11-26T06:22:19Z",
+  "date_created": "2021-11-26T06:22:19",
   "oof_shard": "1"
 }

@@ -1,3 +1,4 @@
+use chrono::{NaiveDateTime};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -18,27 +19,27 @@ pub struct Payment {
     pub request_id: String,
     pub currency: String,
     pub provider: String,
-    pub amount: u32,
-    pub payment_dt: u32,
+    pub amount: i32,
+    pub payment_dt: i32,
     pub bank: String,
-    pub delivery_cost: u32,
-    pub goods_total: u32,
-    pub custom_fee: u32,
+    pub delivery_cost: i32,
+    pub goods_total: i32,
+    pub custom_fee: i32,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Item {
-    pub chrt_id: u32,
+    pub chrt_id: i32,
     pub track_number: String,
-    pub price: u32,
+    pub price: i32,
     pub rid: String,
     pub name: String,
-    pub sale: u32,
+    pub sale: i32,
     pub size: String,
-    pub total_price: u32,
-    pub nm_id: u32,
+    pub total_price: i32,
+    pub nm_id: i32,
     pub brand: String,
-    pub status: u32,
+    pub status: i32,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -55,6 +56,6 @@ pub struct Order {
     pub delivery_service: String,
     pub shardkey: String,
     pub sm_id: i32,
-    pub date_created: String,
+    pub date_created: NaiveDateTime,
     pub oof_shard: String,
 }
