@@ -1,5 +1,8 @@
+use crate::config::DbConfig;
+use crate::db::postgres_db::PostgresDB;
 use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
+use std::error::Error;
 use uuid::Uuid;
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -58,4 +61,35 @@ pub struct Order {
     pub sm_id: i32,
     pub date_created: NaiveDateTime,
     pub oof_shard: String,
+}
+
+pub struct OrdersModel {
+    postgres_instance: PostgresDB,
+}
+
+impl OrdersModel {
+    pub async fn new(db_config: &DbConfig) -> Result<Self, Box<dyn Error>> {
+        // инициализация базы данных
+        let postgres_instance = PostgresDB::new(&db_config).await?;
+
+        Ok(OrdersModel { postgres_instance })
+    }
+
+    pub async fn insert_order(&self, order: &Order) -> Result<(), Box<dyn Error>> {
+        self.postgres_instance.insert_order(order).await?;
+        Ok(())
+    }
+
+    pub async fn get_all_orders(&self) -> Result<Vec<Order>, Box<dyn Error>> {
+        let orders: Vec<Order> = self.postgres_instance.get_all_orders().await?;
+        Ok(orders)
+    }
+
+    pub async fn get_one_order_by_uuid(&self, order_uuid: &Uuid) -> Result<Order, Box<dyn Error>> {
+        let order: Order = self
+            .postgres_instance
+            .get_one_order_by_uuid(order_uuid)
+            .await?;
+        Ok(order)
+    }
 }

@@ -1,9 +1,17 @@
 [package]
-name = "L0"
+name = "l0"
 version = "0.1.0"
 edition = "2021"
 
-default-run="L0"
+default-run="l0"
+
+[[bin]]
+name = "l0"
+path = "src/main.rs"
+
+[lib]
+name = "l0"
+path = "src/lib.rs"
 
 [dependencies]
 uuid = { version = "1.10.0", features = ["serde", "v4"] }

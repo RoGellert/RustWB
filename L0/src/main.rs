@@ -1,29 +1,25 @@
-mod config;
+pub mod config;
 pub mod db {
     pub mod postgres_db;
     // pub mod redis_db;
 }
-mod model;
+pub mod model;
 
 use crate::config::DbConfig;
-use crate::db::postgres_db::PostgresDB;
-use crate::model::Order;
-use std::fs::File;
-use std::io::Read;
+use crate::model::{OrdersModel};
+use std::str::FromStr;
 use std::sync::Arc;
+use uuid::Uuid;
 
 #[tokio::main]
 async fn main() {
     let db_config = DbConfig::new();
+    let orders_model: Arc<OrdersModel> = Arc::new(OrdersModel::new(&db_config).await.unwrap());
 
-    let postgres_instance: Arc<PostgresDB> = Arc::new(PostgresDB::new(&db_config).await.unwrap());
-
-    let mut file = File::open("json_files/model.json").unwrap();
-    let mut contents = String::new();
-    file.read_to_string(&mut contents).unwrap();
-
-    let order: Order = serde_json::from_str(&contents).unwrap();
-
-    postgres_instance.insert_order(&order).await.unwrap();
-    postgres_instance.get_all_orders().await.unwrap();
+    orders_model
+        .get_one_order_by_uuid(&Uuid::from_str("3f46be32-cc4d-408a-a31f-95a6ce17c035").unwrap())
+        .await
+        .unwrap();
+    let orders = orders_model.get_all_orders().await.unwrap();
+    println!("{:?}", &orders);
 }
