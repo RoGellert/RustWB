@@ -3,23 +3,38 @@ pub mod db {
     pub mod postgres_db;
     // pub mod redis_db;
 }
+pub mod controller;
 pub mod model;
 
 use crate::config::DbConfig;
-use crate::model::{OrdersModel};
-use std::str::FromStr;
+use crate::controller::{get_all_orders, get_order_by_uuid, insert_order};
+use crate::model::OrdersModel;
+use axum::routing::{get, post};
+use axum::Router;
 use std::sync::Arc;
-use uuid::Uuid;
+use tracing::{info, Level};
 
 #[tokio::main]
 async fn main() {
+    // ицициализация базы данных
     let db_config = DbConfig::new();
+    // инициализация модели заказов
     let orders_model: Arc<OrdersModel> = Arc::new(OrdersModel::new(&db_config).await.unwrap());
 
-    orders_model
-        .get_one_order_by_uuid(&Uuid::from_str("3f46be32-cc4d-408a-a31f-95a6ce17c035").unwrap())
-        .await
-        .unwrap();
-    let orders = orders_model.get_all_orders().await.unwrap();
-    println!("{:?}", &orders);
+    // инициализация логирования
+    tracing_subscriber::fmt()
+        .with_max_level(Level::INFO)
+        .init();
+
+    let app = Router::new()
+        .route("/orders", get(get_all_orders))
+        .route("/orders/:order_uuid", get(get_order_by_uuid))
+        .route("/orders", post(insert_order))
+        .with_state(orders_model);
+
+    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
+    info!("Сервер AXUM готов принимать запросы на порту 3000");
+    let pass = &db_config.pg_password;
+    info!("Сервер AXUM готов {pass} запросы на порту 3000");
+    axum::serve(listener, app).await.unwrap();
 }

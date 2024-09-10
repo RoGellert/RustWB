@@ -1,8 +1,8 @@
+use l0::config::DbConfig;
+use l0::model::OrdersModel;
 use std::fs::File;
 use std::io::Read;
 use std::sync::Arc;
-use l0::config::DbConfig;
-use l0::model::OrdersModel;
 
 #[tokio::main]
 async fn main() {

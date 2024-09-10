@@ -5,6 +5,7 @@ use deadpool_postgres::{
     Runtime,
 };
 use serde_json::Value;
+use std::error::Error;
 use tokio_postgres::NoTls;
 use uuid::Uuid;
 
@@ -216,7 +217,7 @@ impl PostgresDB {
         Ok(())
     }
 
-    pub async fn get_all_orders(&self) -> Result<Vec<Order>, Box<dyn std::error::Error>> {
+    pub async fn get_all_orders(&self) -> Result<Option<Vec<Order>>, Box<dyn Error>> {
         let client = self.pool.get().await?;
 
         let statement = "
@@ -286,16 +287,22 @@ impl PostgresDB {
 
         let row = client.query_one(statement, &[]).await?;
 
-        let orders_json: Value = row.get("order_json");
+        let orders_json_option: Option<Value> = row.get("order_json");
+
+        let orders_json = match orders_json_option {
+            None => return Ok(None),
+            Some(orders_json) => orders_json,
+        };
+
         let orders: Vec<Order> = serde_json::from_value(orders_json)?;
 
-        Ok(orders)
+        Ok(Some(orders))
     }
 
     pub async fn get_one_order_by_uuid(
         &self,
         order_uid: &Uuid,
-    ) -> Result<Order, Box<dyn std::error::Error>> {
+    ) -> Result<Option<Order>, Box<dyn Error>> {
         let client = self.pool.get().await?;
 
         let statement = "
@@ -366,10 +373,16 @@ impl PostgresDB {
 
         let row = client.query_one(statement, &[order_uid]).await?;
 
-        let orders_json: Value = row.get("order_json");
+        let orders_json_option: Option<Value> = row.get("order_json");
+
+        let orders_json = match orders_json_option {
+            None => return Ok(None),
+            Some(orders_json) => orders_json,
+        };
+
         let mut orders: Vec<Order> = serde_json::from_value(orders_json)?;
         let order: Order = orders.remove(0);
 
-        Ok(order)
+        Ok(Some(order))
     }
 }

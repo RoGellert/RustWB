@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 use std::error::Error;
 use uuid::Uuid;
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, PartialEq)]
 pub struct Delivery {
     pub name: String,
     pub phone: String,
@@ -16,7 +16,7 @@ pub struct Delivery {
     pub email: String,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, PartialEq)]
 pub struct Payment {
     pub transaction: String,
     pub request_id: String,
@@ -30,7 +30,7 @@ pub struct Payment {
     pub custom_fee: i32,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, PartialEq)]
 pub struct Item {
     pub chrt_id: i32,
     pub track_number: String,
@@ -45,7 +45,7 @@ pub struct Item {
     pub status: i32,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, PartialEq)]
 pub struct Order {
     pub order_uid: Uuid,
     pub track_number: String,
@@ -80,13 +80,16 @@ impl OrdersModel {
         Ok(())
     }
 
-    pub async fn get_all_orders(&self) -> Result<Vec<Order>, Box<dyn Error>> {
-        let orders: Vec<Order> = self.postgres_instance.get_all_orders().await?;
+    pub async fn get_all_orders(&self) -> Result<Option<Vec<Order>>, Box<dyn Error>> {
+        let orders: Option<Vec<Order>> = self.postgres_instance.get_all_orders().await?;
         Ok(orders)
     }
 
-    pub async fn get_one_order_by_uuid(&self, order_uuid: &Uuid) -> Result<Order, Box<dyn Error>> {
-        let order: Order = self
+    pub async fn get_one_order_by_uuid(
+        &self,
+        order_uuid: &Uuid,
+    ) -> Result<Option<Order>, Box<dyn Error>> {
+        let order: Option<Order> = self
             .postgres_instance
             .get_one_order_by_uuid(order_uuid)
             .await?;
