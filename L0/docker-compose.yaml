@@ -15,18 +15,22 @@ services:
       - internal
 
   postgres_db:
+    hostname: postgres
     image: postgres:latest
     container_name: postgres_db
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
       POSTGRES_DB: mydatabase
+    volumes:
+      - ./db_init:/docker-entrypoint-initdb.d
     ports:
       - "5432:5432"
     networks:
       - internal
 
   redis_db:
+    hostname: redis
     image: redis:latest
     container_name: redis_db
     ports:

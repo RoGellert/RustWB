@@ -1,25 +1,25 @@
-# Dockerfile
-# 1. Use an official Rust image as a builder
+# официальный образ Rust для сборки
 FROM rust:latest as builder
 
-# 2. Create a new empty shell project and copy manifests
+# ицициализация нового проекта
 RUN cargo new --bin app
 
+# копирование файлов описывающих зависимости
 WORKDIR /app
 COPY Cargo.toml Cargo.lock ./
 
-# 3. Build dependencies to cache them
+# установка с сборка зависимостей
 RUN cargo build --release
 RUN rm -rf src && mkdir src
 
-# 4. Copy the actual source code and build again
+# копирование и сборка исходного кода
 COPY ./src ./src
-RUN cargo build --release
+RUN cargo build --bin l0 --release
 
-# 5. Use a minimal base image and copy the built application
+# ubuntu чтобы не было проблем с библиотеками языка С
 FROM ubuntu:latest
 RUN apt-get update && rm -rf /var/lib/apt/lists/*
 COPY --from=builder /app/target/release/l0 /usr/local/bin/l0
 
-# 6. Set the startup command to run the Axum server
+# запуск сервера
 CMD ["l0"]

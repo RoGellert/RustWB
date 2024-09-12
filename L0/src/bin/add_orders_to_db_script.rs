@@ -1,21 +1,27 @@
-use l0::config::DbConfig;
-use l0::model::OrdersModel;
+//! скрипт для добавления данных в базу через API
+use l0::model::Order;
+use reqwest::Client;
 use std::fs::File;
 use std::io::Read;
-use std::sync::Arc;
 
 #[tokio::main]
 async fn main() {
-    let db_config = DbConfig::new();
-    let orders_model: Arc<OrdersModel> = Arc::new(OrdersModel::new(&db_config).await.unwrap());
-
-    let mut file = File::open("json_files/model.json").unwrap();
+    // чтение данных для добавления из файлика json
+    let mut file = File::open("additional_files/model.json").unwrap();
     let mut contents = String::new();
     file.read_to_string(&mut contents).unwrap();
 
-    let orders: Vec<l0::model::Order> = serde_json::from_str(&contents).unwrap();
+    // десериализация прочтённых данных
+    let orders: Vec<Order> = serde_json::from_str(&contents).unwrap();
 
+    // http post запросы с помощью reqwest
+    let client = Client::new();
     for order in orders {
-        orders_model.insert_order(&order).await.unwrap();
+        client
+            .post("http://127.0.0.1:3000/orders")
+            .json(&order)
+            .send()
+            .await
+            .unwrap();
     }
 }

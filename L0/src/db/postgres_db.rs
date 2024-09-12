@@ -1,3 +1,4 @@
+//! инициализация и методы работы с базой данных Postgres
 use crate::config::DbConfig;
 use crate::model::{Delivery, Item, Order, Payment};
 use deadpool_postgres::{
@@ -9,16 +10,18 @@ use std::error::Error;
 use tokio_postgres::NoTls;
 use uuid::Uuid;
 
+// обёртка вокруг пула подключений
 pub struct PostgresDB {
     pool: Pool,
 }
 
+// парсинг данных окружения и создания конфига для deadpool
 fn create_deadpool_config(db_config: &DbConfig) -> DeadpoolConfig {
     let mut cfg = DeadpoolConfig::new();
     cfg.dbname = Some((db_config.pg_dbname).to_string());
     cfg.user = Some((db_config.pg_user).to_string());
     cfg.password = Some((db_config.pg_password).to_string());
-    cfg.dbname = Some((db_config.pg_dbname).to_string());
+    cfg.host = Some((db_config.pg_host).to_string());
     cfg.manager = Some(ManagerConfig {
         recycling_method: RecyclingMethod::Fast,
     });
@@ -26,7 +29,9 @@ fn create_deadpool_config(db_config: &DbConfig) -> DeadpoolConfig {
     cfg
 }
 
+// методы инициализации и работы с базой данных Postgres
 impl PostgresDB {
+    // создание инстанса базы данных опираясь на конфиг
     pub async fn new(db_config: &DbConfig) -> Result<Self, CreatePoolError> {
         // настройка конфига для подключения и пулинга
         let cfg = create_deadpool_config(db_config);
@@ -37,7 +42,9 @@ impl PostgresDB {
         Ok(Self { pool })
     }
 
-    pub async fn insert_order(&self, order: &Order) -> Result<(), Box<dyn std::error::Error>> {
+    // добавление нового заказа в базу
+    pub async fn insert_order(&self, order: &Order) -> Result<(), Box<dyn Error + Send + Sync>> {
+        // получение подключения из пула
         let client = self.pool.get().await?;
 
         let statement = "
@@ -56,6 +63,7 @@ impl PostgresDB {
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);
         ";
 
+        // выполнение запроса с нужными данными
         client
             .query(
                 statement,
@@ -75,22 +83,28 @@ impl PostgresDB {
             )
             .await?;
 
+        // добавление новой доставки соответвующей заказу в базу
         self.insert_delivery(&order.delivery, &order.order_uid)
             .await?;
+        // добавление новой оплаты соответвующей заказу в базу
         self.insert_payment(&order.payment, &order.order_uid)
             .await?;
+        // добавление новых вещей, соответвующих заказу в базу
         self.insert_items(&order.items, &order.order_uid).await?;
 
         Ok(())
     }
 
+    // функция для добавления доставки, относящейся к заказу, в базу
     async fn insert_delivery(
         &self,
         delivery: &Delivery,
         order_uid: &Uuid,
-    ) -> Result<(), Box<dyn std::error::Error>> {
+    ) -> Result<(), Box<dyn Error + Send + Sync>> {
+        // получение подключения из пула
         let client = self.pool.get().await?;
 
+        // форма запроса
         let statement = "
             INSERT INTO deliveries
             (name,
@@ -104,6 +118,7 @@ impl PostgresDB {
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8);
         ";
 
+        // выполнение запроса с нужными данными
         client
             .query(
                 statement,
@@ -123,13 +138,16 @@ impl PostgresDB {
         Ok(())
     }
 
+    // функция для добавления оплаты, относящейся к заказу, в базу
     async fn insert_payment(
         &self,
         payment: &Payment,
         order_uid: &Uuid,
-    ) -> Result<(), Box<dyn std::error::Error>> {
+    ) -> Result<(), Box<dyn Error + Send + Sync>> {
+        // получение подключения из пула
         let client = self.pool.get().await?;
 
+        // форма запроса
         let statement = "
             INSERT INTO payments
             (transaction,
@@ -146,6 +164,7 @@ impl PostgresDB {
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);
         ";
 
+        // выполнение запроса с нужными данными
         client
             .query(
                 statement,
@@ -168,13 +187,16 @@ impl PostgresDB {
         Ok(())
     }
 
+    // функция для добавления вещей, относящихся к заказу, в базу
     async fn insert_items(
         &self,
         items: &[Item],
         order_uid: &Uuid,
-    ) -> Result<(), Box<dyn std::error::Error>> {
+    ) -> Result<(), Box<dyn Error + Send + Sync>> {
+        // получение подключения из пула
         let client = self.pool.get().await?;
 
+        // форма запроса
         let statement = "
             INSERT INTO items
             (chrt_id,
@@ -192,6 +214,7 @@ impl PostgresDB {
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12);
         ";
 
+        // выполнение запроса с нужными данными
         for item in items.iter() {
             client
                 .query(
@@ -217,9 +240,12 @@ impl PostgresDB {
         Ok(())
     }
 
-    pub async fn get_all_orders(&self) -> Result<Option<Vec<Order>>, Box<dyn Error>> {
+    // функция для получения всех заказов из базы данных
+    pub async fn get_all_orders(&self) -> Result<Option<Vec<Order>>, Box<dyn Error + Send + Sync>> {
+        // получение подключения из пула
         let client = self.pool.get().await?;
 
+        // форма запроса
         let statement = "
                     SELECT json_agg(result) as order_json
                     FROM (
@@ -285,26 +311,33 @@ impl PostgresDB {
                     ) result;
                 ";
 
+        // выполнение запроса
         let row = client.query_one(statement, &[]).await?;
 
+        // парсинг json-а
         let orders_json_option: Option<Value> = row.get("order_json");
 
+        // если json пуст, возврат Ok(None)
         let orders_json = match orders_json_option {
             None => return Ok(None),
             Some(orders_json) => orders_json,
         };
 
+        // десериализация
         let orders: Vec<Order> = serde_json::from_value(orders_json)?;
 
         Ok(Some(orders))
     }
 
+    // функция для получения одно заказа по uuid
     pub async fn get_one_order_by_uuid(
         &self,
         order_uid: &Uuid,
-    ) -> Result<Option<Order>, Box<dyn Error>> {
+    ) -> Result<Option<Order>, Box<dyn Error + Send + Sync>> {
+        // получение подключения из пула
         let client = self.pool.get().await?;
 
+        // форма запроса
         let statement = "
                     SELECT json_agg(result) as order_json
                     FROM (
@@ -371,15 +404,19 @@ impl PostgresDB {
                     ) result;
                 ";
 
+        // выполнение запроса с нужными данными
         let row = client.query_one(statement, &[order_uid]).await?;
 
+        // парсинг json-а
         let orders_json_option: Option<Value> = row.get("order_json");
 
+        // если json пуст, возврат Ok(None)
         let orders_json = match orders_json_option {
             None => return Ok(None),
             Some(orders_json) => orders_json,
         };
 
+        // десериализация
         let mut orders: Vec<Order> = serde_json::from_value(orders_json)?;
         let order: Order = orders.remove(0);
 

@@ -9,10 +9,6 @@ default-run="l0"
 name = "l0"
 path = "src/main.rs"
 
-#[lib]
-#name = "l0"
-#path = "src/lib.rs"
-
 [dependencies]
 uuid = { version = "1.10.0", features = ["serde", "v4"] }
 serde_json = "1.0.127"
@@ -28,6 +24,11 @@ futures = "0.3.30"
 axum = "0.7.5"
 tracing = "0.1.40"
 tracing-subscriber = "0.3.18"
+reqwest = { version = "0.12.7", features = ["json"], optional = true }
+deadpool-redis = { version ="0.17.0", features = ["serde"] }
+
+[features]
+add_orders_dependencies = ["reqwest"]
 
 [dev-dependencies]
-
+reqwest = { version = "0.12.7", features = ["json"] }

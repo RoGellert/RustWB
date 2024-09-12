@@ -26,11 +26,14 @@ async fn main() {
     .await
     .unwrap();
 
+    // инициализация подключения
     tokio::spawn(async move {
         if let Err(e) = connection.await {
             error!("connection error: {e}");
         }
     });
+
+    // запросы
 
     client.query("DROP TABLE deliveries;", &[]).await.unwrap();
 
