@@ -9,7 +9,7 @@ docker compose up --build
 Это построит и запустит контейнер с redis, postgres (с нужными таблицами) и контейнер с сервером AXUM, 
 слушающем на порту 3000
 
-Далее для добавление тестовых данных можно запустить скрипт:
+Далее для добавления тестовых данных можно запустить скрипт:
 
 ```bash
 cargo run --bin add_orders_to_db_script --features add_orders_dependencies
