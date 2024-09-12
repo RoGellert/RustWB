@@ -11,6 +11,9 @@ fn main() {
     // вектор из ссылок на оригинальный массив
     let chunked_data: Vec<&[u32]> = vec.chunks(chunk_size).collect();
 
+    // массив трэдов для обработки
+    let mut handles = vec![];
+
     // цикл для работы с частями данных
     for chunk in chunked_data {
         // передача владения частью данных
@@ -23,7 +26,12 @@ fn main() {
             }
         });
 
-        // ожидание окончания работы трэда
+        // добавления трэда в массив трэдов
+        handles.push(handle);
+    }
+
+    // ожидание окончания работы трэдов
+    for handle in handles {
         handle.join().unwrap()
     }
 }
