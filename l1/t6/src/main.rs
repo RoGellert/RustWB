@@ -59,6 +59,8 @@ async fn main() {
                         break;
                     }
                 };
+
+                // вывод и запись данных
                 data.push(received_data);
                 println!("Текущие данные: {:?}", &data);
             }
