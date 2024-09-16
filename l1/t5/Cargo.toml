@@ -1,0 +1,8 @@
+[package]
+name = "t5"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+tokio = { version = "1.40.0", features = ["rt", "rt-multi-thread", "macros", "signal", "time"] }
+tokio-util = "0.7.12"
