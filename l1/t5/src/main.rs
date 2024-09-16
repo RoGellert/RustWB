@@ -21,7 +21,6 @@ async fn main() {
 
         // начало рабты воркера
         let handle = tokio::spawn(async move {
-
             loop {
                 tokio::select! {
                     // работа воркера
