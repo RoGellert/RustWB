@@ -24,7 +24,7 @@ fn main() {
         }
     }
 
-    // сортировка по интерваламы и конвертация в массив
+    // сортировка по интервалам и конвертация в массив
     let mut vec = vec![];
     for key in hash_map.clone().into_keys().sorted() {
         let Some(temp_vec) = hash_map.get(&key) else {
