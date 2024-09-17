@@ -14,7 +14,7 @@ fn quicksort<T: Ord>(arr: &mut [T]) {
 }
 
 fn partition<T: Ord>(arr: &mut [T]) -> usize {
-    // инициализация правого индекса
+    // инициализация левого индекса
     let mut i = 0;
     // выбор самого правого элемента как pivot
     let pivot_index = arr.len() - 1;
