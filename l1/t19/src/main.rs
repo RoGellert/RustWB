@@ -12,7 +12,7 @@ fn reverse_words(words: &str) -> String {
 }
 
 fn main() {
-    let words_to_reverse = "Hello world";
+    let words_to_reverse = "Hello world aaaaaa";
     let words_reversed = reverse_words(words_to_reverse);
 
     println!("{:?}", &words_reversed);
