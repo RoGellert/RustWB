@@ -1,0 +1,8 @@
+[package]
+name = "t17"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+tokio = {version = "1.40.0", features = ["time", "rt", "rt-multi-thread", "macros", "signal"] }
+time = "0.3.36"
