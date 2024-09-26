@@ -1,6 +1,12 @@
 use std::collections::HashSet;
 use std::env;
-use std::io::{self, BufRead};
+use std::io::{self};
+
+///
+/// пример: t6 -s -f 1-2,3 -d :
+///
+/// айди колонок в аргументе -f начинается с 1 (1-индексировано)
+///
 
 // преобразование строчки с колонками в вектор id колонок
 fn parse_columns(columns_raw: String) -> Vec<usize> {
@@ -12,7 +18,8 @@ fn parse_columns(columns_raw: String) -> Vec<usize> {
     // если строка из одного символа - запись одного айди, если 3 - проверка интревала и запись всех id из него
     for arg in separated_id_args {
         if arg.len() == 1 {
-            resulting_ids_hashed.insert(arg.parse::<usize>().expect("неверный формат id колонки")-1);
+            resulting_ids_hashed
+                .insert(arg.parse::<usize>().expect("неверный формат id колонки") - 1);
         } else if arg.len() == 3 {
             let split_range: Vec<&str> = arg.split('-').collect();
             let (start, finish): (usize, usize) = (
