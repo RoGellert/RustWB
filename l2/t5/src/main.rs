@@ -134,7 +134,6 @@ fn get_required_ids_around(
     max_id: usize,
     adjacent_lines_num: usize,
 ) -> HashSet<usize> {
-
     let mut ids_processed: HashSet<usize> = HashSet::new();
 
     for id in ids_raw {
