@@ -3,6 +3,12 @@ use std::collections::HashSet;
 use std::env;
 use std::fs::read_to_string;
 
+///
+/// Пример: t5 -i -c -C 1  helloWorld input.txt
+///
+/// -v работает с -A -B -C не выводя N строк до/после/вокруг
+///
+
 // записывает строки из файла в вектор
 fn read_lines_from_file(filename: &str) -> Vec<String> {
     let mut file_lines = Vec::new();
@@ -15,27 +21,33 @@ fn read_lines_from_file(filename: &str) -> Vec<String> {
     file_lines
 }
 
-// находит совпадающие с regex строки и записывает их индекс
+// находит совпадающие с regex строки и возвращает их индекс в HashMap
 fn get_regex_match_ids(
     input_strings: &Vec<String>,
     regex_pattern: String,
     register_ignore: bool,
 ) -> HashSet<usize> {
+    // массив для совпадающих айди
     let mut matching_ids: HashSet<usize> = HashSet::new();
 
+    // если нужно игнорировать регистр
     let regex_opinionated = match register_ignore {
         true => regex_pattern.to_lowercase(),
         false => regex_pattern,
     };
 
+    // создание объекта regex
     let re = Regex::new(&regex_opinionated).unwrap();
 
+    // запись id совпадений
     for (i, line) in input_strings.iter().enumerate() {
+        // если нужно игнорировать регистр
         let line_opinionated = match register_ignore {
             true => line.to_lowercase(),
             false => line.to_owned(),
         };
 
+        // есть ли совпадение
         if re.is_match(&line_opinionated) {
             matching_ids.insert(i);
         }
@@ -50,19 +62,24 @@ fn get_fixed_match_ids(
     regex_pattern: String,
     register_ignore: bool,
 ) -> HashSet<usize> {
+    // массив для совпадающих айди
     let mut matching_ids: HashSet<usize> = HashSet::new();
 
+    // если нужно игнорировать регистр
     let regex_opinionated = match register_ignore {
         true => regex_pattern.to_lowercase(),
         false => regex_pattern.to_owned(),
     };
 
+    // запись id совпадений
     for (i, line) in input_strings.iter().enumerate() {
+        // если нужно игнорировать регистр
         let line_opinionated = match register_ignore {
             true => line.to_lowercase(),
             false => line.to_owned(),
         };
 
+        // есть ли совпадение
         if line_opinionated == regex_opinionated {
             matching_ids.insert(i);
         }
@@ -71,6 +88,7 @@ fn get_fixed_match_ids(
     matching_ids
 }
 
+// возвращяет HashMap с id с N строками до и изначальными id
 fn get_required_ids_before(
     ids_raw: HashSet<usize>,
     adjacent_lines_num: usize,
@@ -91,6 +109,7 @@ fn get_required_ids_before(
     ids_processed
 }
 
+// возвращяет HashMap с id с N строками после и изначальными id
 fn get_required_ids_after(
     ids_raw: HashSet<usize>,
     max_id: usize,
@@ -109,6 +128,7 @@ fn get_required_ids_after(
     ids_processed
 }
 
+// возвращяет HashMap с id с N строками вокруг и изначальными id
 fn get_required_ids_around(
     ids_raw: HashSet<usize>,
     max_id: usize,
