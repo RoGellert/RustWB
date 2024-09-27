@@ -7,7 +7,7 @@ use std::time::Instant;
 use std::{env, thread};
 
 ///
-/// пример использования: t7 -f 5 input.txtt7
+/// пример использования: t7 -f 5 input.txt
 ///
 
 // структура для печати в формате json
