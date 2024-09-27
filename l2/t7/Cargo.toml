@@ -1,0 +1,9 @@
+[package]
+name = "t7"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+serde_json = "1.0.128"
+serde = { version = "1.0.210", features = ["derive"] }
+
