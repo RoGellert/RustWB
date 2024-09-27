@@ -6,6 +6,10 @@ use std::sync::mpsc;
 use std::time::Instant;
 use std::{env, thread};
 
+///
+/// пример использования: t7 -f 5 input.txtt7
+///
+
 // структура для печати в формате json
 #[derive(Serialize, Deserialize, Debug)]
 struct Result {
