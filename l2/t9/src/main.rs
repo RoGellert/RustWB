@@ -24,7 +24,7 @@ async fn main() {
     let result_file_name = args[2].to_owned();
 
     // загрузить сайт
-    let response = reqwest::get(url).await.expect("не удалось загрузить сайн");
+    let response = reqwest::get(url).await.expect("не удалось загрузить сайт");
 
     // обработать текст
     let content = response
@@ -36,5 +36,5 @@ async fn main() {
     let mut file =
         File::create(format!("{}.html", result_file_name)).expect("не удалось создать файл");
     file.write_all(content.as_bytes())
-        .expect("не записать содержимое в файл");
+        .expect("не удалось записать содержимое в файл");
 }
