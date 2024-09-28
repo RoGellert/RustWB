@@ -21,7 +21,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     // достать url из аргументов
     let url = args[1].to_owned();
-    // достать url из аргументов
+    // достать название файла для записи результата из аргументов
     let result_file_name = args[2].to_owned();
 
     // загрузить сайт
