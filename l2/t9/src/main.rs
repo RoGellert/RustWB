@@ -1,7 +1,6 @@
 use std::env;
 use std::fs::File;
 use std::io::Write;
-use std::error::Error;
 
 ///
 /// Пример использования: t9 https://github.com downloaded_page
@@ -28,11 +27,9 @@ async fn main()  {
     let response = reqwest::get(url).await.expect("не удалось загрузить сайн");
 
     // обработать текст
-    let content = response.text().await.expect("не удалось обработать текст");
+    let content = response.text().await.expect("не удалось обработать полученный текст");
 
     // создать файл и записать в него содержимое сайта
-    let mut file = File::create(format!("{}.html", result_file_name))?;
-    file.write_all(content.as_bytes())?;
-
-    Ok(())
+    let mut file = File::create(format!("{}.html", result_file_name)).expect("не удалось создать файл");
+    file.write_all(content.as_bytes()).expect("не записать содержимое в файл");
 }
