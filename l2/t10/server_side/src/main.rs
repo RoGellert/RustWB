@@ -2,6 +2,7 @@ use std::io::{Read, Write};
 use std::net::{TcpListener, TcpStream};
 use std::thread;
 
+// обработка подключений
 fn handle_request(mut stream: TcpStream) {
     let mut buffer = [0; 512];
     loop {
@@ -11,7 +12,7 @@ fn handle_request(mut stream: TcpStream) {
                 break;
             }
             Ok(n) => {
-                // читаем данные и выводим их на сервере
+                // чтение данных и запись в сокет
                 let received_data = String::from_utf8_lossy(&buffer[..n]);
                 println!("новые данные записаны в сокет: {}", received_data);
 
