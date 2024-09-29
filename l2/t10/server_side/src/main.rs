@@ -7,19 +7,19 @@ fn handle_request(mut stream: TcpStream) {
     loop {
         match stream.read(&mut buffer) {
             Ok(0) => {
-                println!("Client disconnected.");
+                println!("клиент отключился");
                 break;
             }
             Ok(n) => {
-                // Читаем данные и выводим их на сервере
+                // читаем данные и выводим их на сервере
                 let received_data = String::from_utf8_lossy(&buffer[..n]);
-                println!("Received: {}", received_data);
+                println!("новые данные записаны в сокет: {}", received_data);
 
-                let response = format!("Echo: {}", received_data);
-                stream.write_all(response.as_bytes()).expect("Failed to send response");
+                let response = received_data.to_owned();
+                stream.write_all(response.as_bytes()).expect("не удалость записать данные в сокет");
             }
             Err(e) => {
-                eprintln!("Error reading from socket: {}", e);
+                eprintln!("не удалость прочитать данные из сокета: {}", e);
                 break;
             }
         }
@@ -28,7 +28,7 @@ fn handle_request(mut stream: TcpStream) {
 
 fn main() {
     // адрес для прослушивания на порту 8080
-    let listener = TcpListener::bind("0.0.0.0:8080").expect("Не удалось создать TcpListener на порту 8080");
+    let listener = TcpListener::bind("0.0.0.0:8080").expect("не удалось создать TcpListener на порту 8080");
     println!("сервер готов принимать соединения через сокет на порту 8080");
 
     // принятие подключений в вечном цикле

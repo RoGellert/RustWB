@@ -1,29 +1,43 @@
 use std::env;
 use std::io::{self, BufRead, Read, Write};
 use std::net::{TcpStream, ToSocketAddrs};
-use std::time::Duration;
 use std::thread;
+use std::time::Duration;
+
+///
+/// серверная часть здесь:
+///
 
 fn main() {
     // получение аргументов командной строки
     let args: Vec<String> = env::args().collect();
 
     // хост
-    let mut host: String = String::new();
+    let mut host: String;
     // порт
-    let mut port: String = String::new();
+    let mut port: String;
     // тайм-аут, по умолчанию - две секунды
     let mut timeout: u64 = 2;
 
     // если аргумента 4
     if args.len() == 4 {
+        // парсинг секунд тайм-аута
         if args[1].contains("--timeout") {
-            let seconds_string: Vec<&str> = args[1].split('=').collect();
-            timeout = seconds_string[1][..seconds_string[1].len()].parse::<u64>().unwrap();
+            let seconds_args: Vec<&str> = args[1].split('=').collect();
+            let mut seconds_string = seconds_args[1].to_owned();
+            seconds_string.pop();
+            timeout = seconds_string
+                .parse::<u64>()
+                .expect("неверный формат количества количество секунд")
+        } else {
+            panic!("неверный формат воода секунд тайм-аута")
         }
+        // парсинг хоста и порта
         host = args[2].to_owned();
         port = args[3].to_owned();
+    // если аргумента 3
     } else if args.len() == 3 {
+        // парсинг хоста и порта
         host = args[2].to_owned();
         port = args[3].to_owned();
     } else {
@@ -32,21 +46,28 @@ fn main() {
 
     // преобразование в адрес
     let address = format!("{}:{}", host, port);
-    let addr = address.to_socket_addrs().unwrap().next().unwrap();
+    let addr = address
+        .to_socket_addrs()
+        .unwrap()
+        .next()
+        .expect("не удалось преобразовать аргументы в адрес");
 
     // подключение с таймаутом
-    let mut stream = TcpStream::connect_timeout(&addr, Duration::new(timeout, 0)).expect("невозможно подключиться к сокету");
+    let mut stream = TcpStream::connect_timeout(&addr, Duration::new(timeout, 0))
+        .expect("невозможно подключиться к сокету");
 
     // установка тайм-аутов
     stream
         .set_read_timeout(Some(Duration::new(timeout, 0)))
-        .expect("невозможно ");
+        .expect("невозможно установить тайм-аут чтения в сокет");
     stream
         .set_write_timeout(Some(Duration::new(timeout, 0)))
-        .expect("Failed to set write timeout");
+        .expect("невозможно установить тайм-аут записывания в сокет");
 
     // клонирование потока для чтения в отдельном трэде
-    let mut stream_clone = stream.try_clone().expect("Failed to clone stream");
+    let mut stream_clone = stream
+        .try_clone()
+        .expect("не удалось склонировать поток TCP");
     // создание отдельного потока для чтения
     thread::spawn(move || {
         let mut buffer = [0; 512];
@@ -57,28 +78,26 @@ fn main() {
                     std::process::exit(0);
                 }
                 Ok(n) => {
-                    println!("получено из сокета: {}", String::from_utf8_lossy(&buffer[0..n]));
+                    println!(
+                        "получено из сокета: {}",
+                        String::from_utf8_lossy(&buffer[0..n])
+                    );
                 }
-                Err(e) => {
-                    eprintln!("ошибка чтения из сокета: {}", e);
-                    std::process::exit(1);
+                Err(_) => {
+                    panic!("хост разорвал подключение или ошибка чтения из сокета.");
                 }
             }
         }
     });
 
-    // Основной цикл: чтение из STDIN и отправка в сокет
+    // основной цикл: чтение из STDIN и отправка в сокет
     let stdin = io::stdin();
     for line in stdin.lock().lines() {
-        let line = line.expect("Failed to read line from stdin");
-        match stream.write_all(line.as_bytes()) {
-            Ok(_) => {},
-            Err(e) => {
-                eprintln!("Failed to write to socket: {}", e);
-                break;
-            }
-        }
+        let line = line.expect("не удалось прочитать линию из std");
+        stream
+            .write_all(line.as_bytes())
+            .expect("невозможно записать сообщение в сокет");
     }
 
-    println!("Closing connection.");
+    println!("закрытие подключения");
 }
