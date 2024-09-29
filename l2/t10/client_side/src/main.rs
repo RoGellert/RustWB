@@ -5,7 +5,11 @@ use std::thread;
 use std::time::Duration;
 
 ///
-/// серверная часть здесь:
+/// серверная часть здесь: https://github.com/RoGellert/RustWB/blob/main/l2/t10/server_side/src/main.rs
+///
+/// в Windows powershell поведение Ctrl+D (EOF) по умолчанию имплеменировано через Ctrl+Z
+///
+/// пример использования: client_side --timeout=10s 127.0.0.1 8080
 ///
 
 fn main() {
@@ -13,9 +17,9 @@ fn main() {
     let args: Vec<String> = env::args().collect();
 
     // хост
-    let mut host: String;
+    let host: String;
     // порт
-    let mut port: String;
+    let port: String;
     // тайм-аут, по умолчанию - две секунды
     let mut timeout: u64 = 2;
 
@@ -38,8 +42,8 @@ fn main() {
     // если аргумента 3
     } else if args.len() == 3 {
         // парсинг хоста и порта
-        host = args[2].to_owned();
-        port = args[3].to_owned();
+        host = args[1].to_owned();
+        port = args[2].to_owned();
     } else {
         panic!("неверное количество агрументов")
     }
