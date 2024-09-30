@@ -1,5 +1,7 @@
-use crate::controller::{create_event, delete_event, events_for_day, events_for_month, events_for_week, update_event};
-use crate::model::{Event, EventModel};
+use crate::controller::{
+    create_event, delete_event, events_for_day, events_for_month, events_for_week, update_event,
+};
+use crate::model::EventModel;
 use axum::routing::{get, post};
 use axum::Router;
 use std::sync::Arc;
@@ -8,8 +10,28 @@ use tracing::{info, Level};
 mod controller;
 mod model;
 
+// конфиг для Axum
+struct AxumConfig {
+    host: String,
+    port: String,
+}
+
+impl AxumConfig {
+    // инициализация конфига
+    pub fn new(host: String, port: String) -> Self {
+        Self { host, port }
+    }
+
+    pub fn to_address(&self) -> String {
+        format!("{}:{}", &self.host, &self.port)
+    }
+}
+
 #[tokio::main]
 async fn main() {
+    // инициализация конфига axum
+    let axum_config = AxumConfig::new("0.0.0.0".to_string(), "3000".to_string());
+
     // инициализация модели заказов
     let event_model: Arc<EventModel> = Arc::new(EventModel::new());
 
@@ -27,7 +49,9 @@ async fn main() {
         .with_state(event_model);
 
     // старт сервера на порту 3000
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
+    let listener = tokio::net::TcpListener::bind(axum_config.to_address())
+        .await
+        .unwrap();
     info!("Сервер AXUM готов принимать запросы на порту 3000");
     axum::serve(listener, app).await.unwrap();
 }
