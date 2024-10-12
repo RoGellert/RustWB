@@ -1,14 +1,10 @@
 //! инициализация и методы работы с базой данных Postgres
 use crate::config::DbConfig;
-use crate::model::{Delivery, Item, Order, Payment};
 use deadpool_postgres::{
     Config as DeadpoolConfig, CreatePoolError, GenericClient, ManagerConfig, Pool, RecyclingMethod,
     Runtime,
 };
-use serde_json::Value;
-use std::error::Error;
 use tokio_postgres::NoTls;
-use uuid::Uuid;
 
 // обёртка вокруг пула подключений
 pub struct PostgresDB {
