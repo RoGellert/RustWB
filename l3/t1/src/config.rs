@@ -12,7 +12,7 @@ pub struct DbConfig {
 
 // структура конфига авторизации
 pub struct AuthConfig {
-    pub jwt_expiry_time: u32,
+    pub jwt_expiry_time: i64,
     pub server_encoding_key: String,
 }
 
@@ -49,7 +49,7 @@ impl Config {
         // срок истечения токена JWT в секундах
         let jwt_expiry_time = env::var("JWT_EXPIRY_TIME")
             .expect("JWT_EXPIRY_TIME не найден в переменных окружения")
-            .parse::<u32>()
+            .parse::<i64>()
             .expect("неверное количество секунд истечения jwt токена");
         // приватный ключ сервера для авторизации
         let server_encoding_key = env::var("SERVER_ENCODING_KEY")

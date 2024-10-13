@@ -10,7 +10,6 @@ services:
       - docker_compose.env
     depends_on:
       - postgres_db
-      - redis_db
     networks:
       - internal
 
