@@ -11,6 +11,7 @@ use std::error::Error;
 use tokio_postgres::NoTls;
 
 // обёртка вокруг пула подключений
+#[derive(Clone)]
 pub struct PostgresDB {
     pool: Pool,
 }
@@ -18,10 +19,10 @@ pub struct PostgresDB {
 // парсинг данных окружения и создания конфига для deadpool
 fn create_deadpool_config(db_config: &DbConfig) -> DeadpoolConfig {
     let mut cfg = DeadpoolConfig::new();
-    cfg.dbname = Some((db_config.pg_dbname).to_string());
-    cfg.user = Some((db_config.pg_user).to_string());
-    cfg.password = Some((db_config.pg_password).to_string());
-    cfg.host = Some((db_config.pg_host).to_string());
+    cfg.dbname = Some(db_config.pg_dbname.to_string());
+    cfg.user = Some(db_config.pg_user.to_string());
+    cfg.password = Some(db_config.pg_password.to_string());
+    cfg.host = Some(db_config.pg_host.to_string());
     cfg.manager = Some(ManagerConfig {
         recycling_method: RecyclingMethod::Fast,
     });
@@ -77,13 +78,13 @@ impl PostgresDB {
 
         // форма запроса
         let statement = "
-            SELECT * FROM users
-            WHERE login = &1
+            SELECT json_agg(result) FROM
+            (SELECT * FROM users WHERE login = $1)
+            result;
         ";
 
         // выполнение запроса с нужными данными
         let row = client.query_one(statement, &[&login]).await?;
-
         let user_json_option: Option<Value> = row.get(0);
 
         // если json пуст, возврат Ok(None)
@@ -93,7 +94,8 @@ impl PostgresDB {
         };
 
         // десериализация
-        let user: User = serde_json::from_value(user_json)?;
+        let mut user_vec: Vec<User> = serde_json::from_value(user_json)?;
+        let user = user_vec.remove(0);
 
         Ok(Some(user))
     }

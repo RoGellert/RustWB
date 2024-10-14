@@ -3,6 +3,7 @@ use dotenv::dotenv;
 use std::env;
 
 // структура конфига базы данных
+#[derive(Clone)]
 pub struct DbConfig {
     pub pg_host: String,
     pub pg_user: String,
@@ -11,12 +12,14 @@ pub struct DbConfig {
 }
 
 // структура конфига авторизации
+#[derive(Clone)]
 pub struct AuthConfig {
     pub jwt_expiry_time: i64,
     pub server_encoding_key: String,
 }
 
 // струкутра общего конфига
+#[derive(Clone)]
 pub struct Config {
     pub db_config: DbConfig,
     pub auth_config: AuthConfig,

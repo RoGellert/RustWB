@@ -575,25 +575,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "l3_t1"
-version = "0.1.0"
-dependencies = [
- "axum",
- "bcrypt",
- "chrono",
- "deadpool-postgres",
- "dotenv",
- "jsonwebtoken",
- "serde",
- "serde_json",
- "tokio",
- "tokio-postgres",
- "tracing",
- "tracing-subscriber",
- "uuid",
-]
-
-[[package]]
 name = "lazy_static"
 version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1126,6 +1107,25 @@ name = "sync_wrapper"
 version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a7065abeca94b6a8a577f9bd45aa0867a2238b74e8eb67cf10d492bc39351394"
+
+[[package]]
+name = "t1"
+version = "0.1.0"
+dependencies = [
+ "axum",
+ "bcrypt",
+ "chrono",
+ "deadpool-postgres",
+ "dotenv",
+ "jsonwebtoken",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tokio-postgres",
+ "tracing",
+ "tracing-subscriber",
+ "uuid",
+]
 
 [[package]]
 name = "thiserror"

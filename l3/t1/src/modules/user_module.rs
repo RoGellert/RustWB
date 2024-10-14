@@ -3,6 +3,7 @@ use crate::pg_db::PostgresDB;
 use std::error::Error;
 use std::sync::Arc;
 
+#[derive(Clone)]
 pub struct UserModule {
     postgres_db: Arc<PostgresDB>,
 }

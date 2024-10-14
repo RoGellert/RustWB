@@ -1,12 +1,13 @@
 use crate::config::Config;
-use crate::modules::auth_module::AuthModule;
+use crate::controller::{hello, login, register};
+use crate::modules::auth_module::{jwt_protected, AuthModule};
 use crate::modules::user_module::UserModule;
 use crate::pg_db::PostgresDB;
+use axum::middleware::from_fn_with_state;
+use axum::routing::{get, post};
 use axum::Router;
 use std::sync::Arc;
-use axum::routing::post;
 use tracing::{info, Level};
-use crate::controller::{login, register};
 
 pub mod modules {
     pub mod auth_module;
@@ -14,12 +15,13 @@ pub mod modules {
     pub mod user_module;
 }
 mod config;
+mod controller;
 mod data_types;
 mod errors;
 mod pg_db;
-mod controller;
 
-struct AppState {
+#[derive(Clone)]
+pub struct AppState {
     pub auth_module: AuthModule,
 }
 
@@ -54,10 +56,16 @@ async fn main() {
     let app = Router::new()
         .route("/register", post(register))
         .route("/login", post(login))
+        .route(
+            "/hello",
+            get(hello).layer(from_fn_with_state(Arc::clone(&app_state), jwt_protected)),
+        )
         .with_state(app_state);
 
     // старт сервера на порту 3000
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.expect("не удалось запустить сервер AXUM");
+    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000")
+        .await
+        .expect("не удалось запустить сервер AXUM");
     info!("Сервер AXUM готов принимать запросы на порту 3000");
     axum::serve(listener, app).await.unwrap();
 }
