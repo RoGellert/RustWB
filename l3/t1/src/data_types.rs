@@ -57,7 +57,7 @@ pub struct PostPayload {
 impl PostPayload {
     pub fn is_valid(&self) -> Result<(), String> {
         if self.post_text.len() > 250 || self.post_text.is_empty() {
-            return Err("текст поста не может быть пустым или больше чем 250 символов".to_string())
+            return Err("текст поста не может быть пустым или содержать больше чем 250 символов".to_string())
         }
 
         Ok(())

@@ -205,7 +205,7 @@ impl PostgresDB {
         // форма запроса
         let statement = "
             SELECT json_agg(result) FROM
-            (SELECT * FROM posts WHERE
+            (SELECT * FROM user_likes WHERE
             user_uuid = $1 AND
             post_uuid = $2)
             result;

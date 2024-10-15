@@ -124,6 +124,11 @@ impl AuthModule {
 
     // log-in пользователя
     pub async fn login_user(&self, user_payload: UserPayload) -> Result<String, ServerError> {
+        // валидация
+        if let Err(text) = user_payload.is_valid() {
+            return Err(ServerError::Validation(text));
+        }
+
         let login = user_payload.login;
         let password = user_payload.password;
 
