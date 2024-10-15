@@ -1,7 +1,7 @@
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use std::error::Error;
-use tracing::{error, warn};
+use tracing::error;
 
 // потенциальные ошибки
 pub enum ServerError {
@@ -10,8 +10,9 @@ pub enum ServerError {
     Postgres(Box<dyn Error>),
     Serialization(String),
     Unauthorised(String),
-    Password(String),
+    PasswordHashGeneration(String),
     Jwt(String),
+    Validation(String),
     Unknown,
 }
 
@@ -20,10 +21,18 @@ impl IntoResponse for ServerError {
     fn into_response(self) -> Response {
         match self {
             ServerError::NotFound(text) => {
-                warn!("Данные по запросу не найдены: {:?}", text);
+                error!("Данные по запросу не найдены: {:?}", text);
                 (
                     StatusCode::NOT_FOUND,
                     format!("Данные по запросу не найдены: {:?}", text),
+                )
+                    .into_response()
+            }
+            ServerError::Validation(text) => {
+                error!("Ошибка валидации входных данных: {:?}", text);
+                (
+                    StatusCode::BAD_REQUEST,
+                    format!("Ошибка валидации входных данных: {:?}", text),
                 )
                     .into_response()
             }
@@ -48,29 +57,29 @@ impl IntoResponse for ServerError {
                 (StatusCode::INTERNAL_SERVER_ERROR, "Неизвестная ошибка").into_response()
             }
             ServerError::Unauthorised(text) => {
-                error!("Неавторизованный запрос: {:?}", text);
+                error!("Ошибка авторизации запроса: {:?}", text);
                 (
                     StatusCode::UNAUTHORIZED,
-                    format!("Неавторизованный запрос: {:?}", text),
+                    format!("Ошибка авторизации запроса: {:?}", text),
                 )
                     .into_response()
             }
-            ServerError::Password(text) => {
+            ServerError::PasswordHashGeneration(text) => {
                 error!("Ошибка пароля: {:?}", text);
                 (
-                    StatusCode::UNAUTHORIZED,
+                    StatusCode::INTERNAL_SERVER_ERROR,
                     format!("Ошибка пароля: {:?}", text),
                 )
                     .into_response()
             }
             ServerError::Jwt(text) => {
                 error!("Ошибка jwt: {:?}", text);
-                (StatusCode::UNAUTHORIZED, format!("Ошибка jwt: {:?}", text)).into_response()
+                (StatusCode::INTERNAL_SERVER_ERROR, format!("Ошибка генерации jwt: {:?}", text)).into_response()
             }
             ServerError::BusinessLogic(text) => {
                 error!("Ошибка бизнес-логики: {:?}", text);
                 (
-                    StatusCode::UNAUTHORIZED,
+                    StatusCode::BAD_REQUEST,
                     format!("Ошибка бизнес-логики: {:?}", text),
                 )
                     .into_response()
