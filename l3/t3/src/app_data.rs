@@ -22,6 +22,20 @@ pub struct AppData {
 }
 
 impl AppData {
+    pub fn new() -> Self {
+        let users: DashMap<String, User> = DashMap::new();
+        let rooms: DashMap<Uuid, Room> = DashMap::new();
+        let messages: DashMap<Uuid, Arc<RwLock<Vec<Message>>>> = DashMap::new();
+        let user_count = AtomicUsize::new(0);
+
+        AppData {
+            users,
+            rooms,
+            messages,
+            user_count
+        }
+    }
+
     // возврат пользователя по логину из базы
     pub fn get_user_by_login(&self, login: &str) -> Option<User> {
         self.users.get(login).map(|user| user.clone())
@@ -31,12 +45,7 @@ impl AppData {
     pub fn insert_new_user(
         &self,
         user_payload: UserPayloadHashed,
-    ) -> Option<()> {
-        // возврат None если пользователь уже присуствует в данных
-        if self.get_user_by_login(&user_payload.login).is_some() {
-            return None;
-        };
-
+    ) {
         let user_login = user_payload.login.clone();
         let new_user = User {
             login: user_payload.login.clone(),
@@ -49,8 +58,6 @@ impl AppData {
         self.user_count.fetch_add(1, Ordering::SeqCst);
 
         info!("пользователь с логином {} добавлен в данные", &user_login);
-
-        Some(())
     }
 
     // добавление новой комнаты в данные и запуск трэда обработки сообщений
@@ -150,5 +157,11 @@ impl AppData {
         info!("пользователь под логином {} вошел в комнату {}", login, room_uuid);
 
         Some(())
+    }
+}
+
+impl Default for AppData {
+    fn default() -> Self {
+        Self::new()
     }
 }
