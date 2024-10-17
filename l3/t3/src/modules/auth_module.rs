@@ -12,7 +12,6 @@ use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, TokenData, 
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use tracing::info;
-use uuid::Uuid;
 use crate::app_data::AppData;
 use crate::data_model::{UserPayload, UserPayloadHashed, Validate};
 

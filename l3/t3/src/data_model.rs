@@ -1,3 +1,4 @@
+use serde::{Deserialize, Serialize};
 use tokio::sync::mpsc::Sender;
 use uuid::Uuid;
 
@@ -5,13 +6,14 @@ pub trait Validate {
     fn is_valid(&self) -> Result<(), String>;
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct User {
     pub login: String,
     pub password_hash: String,
     pub room_uuid: Option<Uuid>,
 }
 
+#[derive(Serialize, Deserialize)]
 pub struct UserPayload {
     pub login: String,
     pub password: String,
@@ -32,6 +34,7 @@ impl Validate for UserPayload {
     }
 }
 
+#[derive(Serialize, Deserialize)]
 pub struct UserPayloadHashed {
     pub login: String,
     pub password_hash: String,
@@ -45,6 +48,7 @@ pub struct Message {
     pub created_at: i64,
 }
 
+#[derive(Serialize, Deserialize)]
 pub struct MessagePayload {
     pub message_text: String,
 }
@@ -70,6 +74,7 @@ pub struct Room {
     pub tx: Sender<Message>,
 }
 
+#[derive(Serialize, Deserialize)]
 pub struct RoomPayload {
     pub name: String,
 }

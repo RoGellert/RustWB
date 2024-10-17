@@ -4,7 +4,6 @@ use std::error::Error;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::{Arc, RwLock};
 use tokio::sync::mpsc;
-use tokio::sync::mpsc::error::SendError;
 use tokio::sync::mpsc::{Sender};
 use tracing::info;
 use uuid::Uuid;

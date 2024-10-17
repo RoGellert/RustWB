@@ -1,8 +1,10 @@
 use std::sync::Arc;
 use axum::Router;
+use axum::routing::post;
 use tracing::{info, Level};
 use crate::app_data::AppData;
 use crate::config::AuthConfig;
+use crate::controller::{login, register};
 use crate::modules::auth_module::AuthModule;
 
 mod app_data;
@@ -35,7 +37,7 @@ async fn main() {
     // инициализация состояния данных
     let app_data = Arc::new(AppData::new());
     // инициализация модуля авторизации
-    let auth_module = AuthModule::new( Arc::clone(&app_data), auth_config);
+    let auth_module = AuthModule::new(Arc::clone(&app_data), auth_config);
 
     // разделённое состояние
     let app_state = Arc::new(AppState::new(auth_module));
@@ -45,6 +47,8 @@ async fn main() {
 
     // конфигурация энд-поинтов и общих ресурсов
     let app = Router::new()
+        .route("/register", post(register))
+        .route("/login", post(login))
         .with_state(app_state);
 
     // старт сервера на порту 3000
