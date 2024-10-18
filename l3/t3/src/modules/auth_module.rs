@@ -1,4 +1,6 @@
+use crate::app_data::AppData;
 use crate::config::AuthConfig;
+use crate::data_model::{UserPayload, UserPayloadHashed, Validate};
 use crate::errors::ServerError;
 use crate::AppState;
 use axum::body::Body;
@@ -12,8 +14,6 @@ use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, TokenData, 
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use tracing::info;
-use crate::app_data::AppData;
-use crate::data_model::{UserPayload, UserPayloadHashed, Validate};
 
 // структура с логином и хэшем пароля
 impl UserPayloadHashed {
@@ -46,7 +46,7 @@ impl AuthModule {
     pub fn new(app_data: Arc<AppData>, auth_config: AuthConfig) -> Self {
         AuthModule {
             app_data,
-            auth_config
+            auth_config,
         }
     }
 
@@ -82,11 +82,13 @@ impl AuthModule {
         // проверка на наличие пользователя с таким логином в базе
         if self
             .app_data
-            .get_user_by_login(&user_payload.login).is_some() {
+            .get_user_by_login(&user_payload.login)
+            .is_some()
+        {
             return Err(ServerError::BusinessLogic(format!(
                 "пользователь с логином {} уже существует в базе данных",
                 user_payload.login
-            )))
+            )));
         }
 
         // хэширование пароля и возврат стуртуры с хэшем пароля и логином
@@ -102,13 +104,9 @@ impl AuthModule {
         let login_ref = user_payload_hashed.login.clone();
 
         // добавление пользователя в базу
-        self.app_data
-            .insert_new_user(user_payload_hashed);
+        self.app_data.insert_new_user(user_payload_hashed);
 
-        info!(
-            "пользователь {} зарегистрировался",
-            login_ref
-        );
+        info!("пользователь {} зарегистрировался", login_ref);
 
         Ok(())
     }
@@ -131,7 +129,7 @@ impl AuthModule {
                     login
                 )))
             }
-            Some(user) => user
+            Some(user) => user,
         };
 
         let password_hash = user.password_hash;
@@ -156,10 +154,12 @@ impl AuthModule {
         // генерация jwt
         let token = match self.encode_jwt(login.clone()) {
             Ok(token) => token,
-            Err(_) => return Err(ServerError::Jwt(format!(
-                "ошибка генерации jwt для пользователя {}",
-                login
-            ))),
+            Err(_) => {
+                return Err(ServerError::Jwt(format!(
+                    "ошибка генерации jwt для пользователя {}",
+                    login
+                )))
+            }
         };
 
         info!("пользователь {} получил новый JWT", login);
@@ -209,9 +209,7 @@ pub async fn jwt_protected(
     }
 
     // передача логина из миддлвары в хэндлер
-    request
-        .extensions_mut()
-        .insert(token_data.claims.login);
+    request.extensions_mut().insert(token_data.claims.login);
 
     Ok(next.run(request).await)
 }
