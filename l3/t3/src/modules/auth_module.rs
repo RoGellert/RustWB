@@ -8,17 +8,18 @@ use axum::extract::{Request, State};
 use axum::http::header::AUTHORIZATION;
 use axum::middleware::Next;
 use axum::response::Response;
-use bcrypt::{hash, verify, BcryptError, DEFAULT_COST};
+use bcrypt::{hash, verify, DEFAULT_COST};
 use chrono::{Duration, Utc};
 use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, TokenData, Validation};
 use serde::{Deserialize, Serialize};
+use std::error::Error;
 use std::sync::Arc;
 use tracing::info;
 
 // структура с логином и хэшем пароля
 impl UserPayloadHashed {
     // хэширование пароля и возврат структуры
-    pub fn from_user_payload(user_payload: UserPayload) -> Result<Self, BcryptError> {
+    pub fn from_user_payload(user_payload: UserPayload) -> Result<Self, Box<dyn Error>> {
         let password_hash = hash(&user_payload.password, DEFAULT_COST)?;
 
         Ok(UserPayloadHashed {

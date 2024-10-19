@@ -83,7 +83,7 @@ pub async fn messages_by_room_uuid(
     Ok(Json(messages))
 }
 
-// GET /messages - получение сообщений из комнаты в которой в данный момент находится пользователь по uuid
+// GET /messages - получение сообщений из комнаты в которой в данный момент находится пользователь
 pub async fn messages_by_current_room(
     State(app_state): State<Arc<AppState>>,
     Extension(user_login): Extension<String>,
