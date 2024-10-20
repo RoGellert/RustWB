@@ -97,7 +97,7 @@ impl Validate for RoomPayload {
     fn is_valid(&self) -> Result<(), String> {
         if self.name.len() > 25 || self.name.is_empty() {
             return Err(
-                "название коменаты не может быть пустым или содержать больше чем 25 символов"
+                "название комнаты не может быть пустым или содержать больше чем 25 символов"
                     .to_string(),
             );
         }

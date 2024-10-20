@@ -1,0 +1,55 @@
+services:
+  axum_server:
+    build:
+      context: .
+      dockerfile: /server/Dockerfile
+    container_name: axum_server
+    ports:
+      - "3000:3000"
+    env_file:
+      - docker_compose.env
+    depends_on:
+      - postgres_db
+    networks:
+      - internal
+
+  listener:
+    build:
+      context: .
+      dockerfile: /listener/Dockerfile
+    container_name: listener
+    env_file:
+      - docker_compose.env
+    depends_on:
+      - kafka
+      - axum_server
+    networks:
+      - internal
+
+  postgres_db:
+    hostname: postgres
+    image: postgres:latest
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mydatabase
+    volumes:
+      - ./db_init:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+    networks:
+      - internal
+
+  kafka:
+    hostname: kafka
+    image: apache/kafka:latest
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    networks:
+      - internal
+
+networks:
+  internal:
+    driver: bridge
