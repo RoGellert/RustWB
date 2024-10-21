@@ -7,7 +7,7 @@ COPY ./server/Cargo.toml ./server/Cargo.lock ./
 
 # создание dummy-файла проекта и установка зависимостей
 RUN mkdir src && echo "fn main() {}" > src/main.rs
-RUN cargo build --release
+RUN cargo build
 
 # копирование и сборка исходного кода
 COPY ./server/src ./src
