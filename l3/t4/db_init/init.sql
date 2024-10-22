@@ -9,11 +9,11 @@ CREATE TABLE users (
 CREATE OR REPLACE FUNCTION notify_user_change() RETURNS trigger AS $$
 BEGIN
     IF (TG_OP = 'INSERT') THEN
-        PERFORM pg_notify('user_changes', json_build_object('type', 'insert', 'id', NEW.id, 'name', NEW.name, 'email', NEW.email)::text);
+        PERFORM pg_notify('user_changes', json_build_object('type', 'insert', 'user_id', NEW.user_id, 'name', NEW.name, 'email', NEW.email)::text);
     ELSIF (TG_OP = 'UPDATE') THEN
-        PERFORM pg_notify('user_changes', json_build_object('type', 'update', 'id', NEW.id, 'new_name', NEW.name, 'old_name', OLD.name, 'new_email', NEW.email, 'old_email', OLD.email)::text);
+        PERFORM pg_notify('user_changes', json_build_object('type', 'update', 'user_id', NEW.user_id, 'new_name', NEW.name, 'old_name', OLD.name, 'new_email', NEW.email, 'old_email', OLD.email)::text);
     ELSIF (TG_OP = 'DELETE') THEN
-        PERFORM pg_notify('user_changes', json_build_object('type', 'delete', 'id', OLD.id, 'old_name', OLD.name, 'old_email', OLD.email)::text);
+        PERFORM pg_notify('user_changes', json_build_object('type', 'delete', 'user_id', NEW.user_id, 'old_name', OLD.name, 'old_email', OLD.email)::text);
     END IF;
     RETURN NEW;
 END;
@@ -40,11 +40,11 @@ CREATE TABLE products (
 CREATE OR REPLACE FUNCTION notify_product_change() RETURNS trigger AS $$
 BEGIN
     IF (TG_OP = 'INSERT') THEN
-        PERFORM pg_notify('product_changes', json_build_object('type', 'insert', 'id', NEW.id, 'name', NEW.name, 'price', NEW.price)::text);
+        PERFORM pg_notify('product_changes', json_build_object('type', 'insert', 'product_id', NEW.product_id, 'name', NEW.name, 'price', NEW.price)::text);
     ELSIF (TG_OP = 'UPDATE') THEN
-        PERFORM pg_notify('product_changes', json_build_object('type', 'update', 'id', NEW.id, 'new_name', NEW.name, 'old_name', OLD.name, 'new_price', NEW.price, 'old_price', OLD.price)::text);
+        PERFORM pg_notify('product_changes', json_build_object('type', 'update', 'product_id', NEW.product_id, 'new_name', NEW.name, 'old_name', OLD.name, 'new_price', NEW.price, 'old_price', OLD.price)::text);
     ELSIF (TG_OP = 'DELETE') THEN
-        PERFORM pg_notify('product_changes', json_build_object('type', 'delete', 'id', OLD.id, 'old_name', OLD.name, 'old_price', OLD.price)::text);
+        PERFORM pg_notify('product_changes', json_build_object('type', 'delete', 'product_id', NEW.product_id, 'old_name', OLD.name, 'old_price', OLD.price)::text);
     END IF;
     RETURN NEW;
 END;

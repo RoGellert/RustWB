@@ -6,7 +6,7 @@ use std::env;
 #[derive(Clone)]
 pub struct Config {
     pub db_config: DbConfig,
-    pub kafka_config: KafkaConfig
+    pub kafka_config: KafkaConfig,
 }
 
 // структура конфига базы данных
@@ -50,19 +50,21 @@ impl Config {
         };
 
         // хост сервиса Kafka
-        let kafka_host = env::var("KAFKA_HOST").expect("KAFKA_HOST не найден в переменных окружения");
+        let kafka_host =
+            env::var("KAFKA_HOST").expect("KAFKA_HOST не найден в переменных окружения");
         // порт сервиса Kafka
-        let kafka_port = env::var("KAFKA_PORT").expect("KAFKA_PORT не найден в переменных окружения");
+        let kafka_port =
+            env::var("KAFKA_PORT").expect("KAFKA_PORT не найден в переменных окружения");
 
         // конфиг базы данных
         let kafka_config = KafkaConfig {
             kafka_port,
-            kafka_host
+            kafka_host,
         };
 
         Config {
             db_config,
-            kafka_config
+            kafka_config,
         }
     }
 }
