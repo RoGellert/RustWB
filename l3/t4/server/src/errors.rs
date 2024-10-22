@@ -5,7 +5,6 @@ use tracing::error;
 
 // потенциальные ошибки
 pub enum ServerError {
-    BusinessLogic(String),
     Postgres(Box<dyn Error>),
 }
 
@@ -18,14 +17,6 @@ impl IntoResponse for ServerError {
                 (
                     StatusCode::INTERNAL_SERVER_ERROR,
                     format!("Ошибка базы данных Postgres {:?}", err),
-                )
-                    .into_response()
-            }
-            ServerError::BusinessLogic(text) => {
-                error!("Ошибка бизнес-логики: {:?}", text);
-                (
-                    StatusCode::BAD_REQUEST,
-                    format!("Ошибка бизнес-логики: {:?}", text),
                 )
                     .into_response()
             }

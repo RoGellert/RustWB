@@ -1,6 +1,6 @@
 use crate::config::DbConfig;
-use crate::modules::product_module::Product;
-use crate::modules::user_module::User;
+use crate::modules::product_module::{Product, ProductPayload};
+use crate::modules::user_module::{User, UserPayload};
 use deadpool_postgres::{
     Config as DeadpoolConfig, CreatePoolError, ManagerConfig, Pool, RecyclingMethod, Runtime,
 };
@@ -61,11 +61,55 @@ impl PostgresDB {
         Ok(())
     }
 
-    // добавление продукта в базу
-    pub async fn insert_product(
+    // изменение данных пользователя в базе
+    pub async fn update_user(&self, user_id: i32, user_payload: UserPayload) -> Result<(), Box<dyn Error>> {
+        // получение подключения из пула
+        let client = self.pool.get().await?;
+
+        // форма запроса
+        let statement = "
+            UPDATE users
+            SET name = $1, email = $2
+            WHERE user_id = $3
+        ";
+
+        // выполнение запроса с нужными данными
+        client
+            .query(statement, &[&user_payload.name, &user_payload.email, &user_id])
+            .await?;
+
+        Ok(())
+    }
+
+    // удаление данных о пользователе из базы
+    pub async fn delete_user(
         &self,
-        product: Product,
+        user_id: i32,
     ) -> Result<(), Box<dyn Error>> {
+        // получение подключения из пула
+        let client = self.pool.get().await?;
+
+        // форма запроса
+        let statement = "
+            DELETE FROM users
+            WHERE user_id = $1
+        ";
+
+        // выполнение запроса с нужными данными
+        client
+            .query(
+                statement,
+                &[
+                    &user_id,
+                ],
+            )
+            .await?;
+
+        Ok(())
+    }
+
+    // добавление продукта в базу
+    pub async fn insert_product(&self, product: Product) -> Result<(), Box<dyn Error>> {
         // получение подключения из пула
         let client = self.pool.get().await?;
 
@@ -80,12 +124,52 @@ impl PostgresDB {
 
         // выполнение запроса с нужными данными
         client
+            .query(statement, &[&product.product_id, &product.name, &product.price])
+            .await?;
+
+        Ok(())
+    }
+
+    // изменение данных продукта в базе
+    pub async fn update_product(&self, product_id: i32, product_payload: ProductPayload) -> Result<(), Box<dyn Error>> {
+        // получение подключения из пула
+        let client = self.pool.get().await?;
+
+        // форма запроса
+        let statement = "
+            UPDATE products
+            SET name = $1, price = $2
+            WHERE product_id = $3
+        ";
+
+        // выполнение запроса с нужными данными
+        client
+            .query(statement, &[&product_payload.name, &product_payload.price, &product_id])
+            .await?;
+
+        Ok(())
+    }
+
+    // удаление данных о продукте из базы
+    pub async fn delete_product(
+        &self,
+        product_id: i32,
+    ) -> Result<(), Box<dyn Error>> {
+        // получение подключения из пула
+        let client = self.pool.get().await?;
+
+        // форма запроса
+        let statement = "
+            DELETE FROM products
+            WHERE product_id = $1
+        ";
+
+        // выполнение запроса с нужными данными
+        client
             .query(
                 statement,
                 &[
-                    &product.product_id,
-                    &product.name,
-                    &product.price,
+                    &product_id,
                 ],
             )
             .await?;

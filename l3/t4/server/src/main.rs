@@ -1,9 +1,9 @@
 use crate::config::DbConfig;
-use crate::controller::add_user;
+use crate::controller::{add_product, add_user, delete_product, delete_user, update_product, update_user};
 use crate::modules::product_module::ProductModule;
 use crate::modules::user_module::UserModule;
 use crate::pg_db::PostgresDB;
-use axum::routing::post;
+use axum::routing::{delete, post, put};
 use axum::Router;
 use std::sync::Arc;
 use tracing::{info, Level};
@@ -56,6 +56,11 @@ async fn main() {
     // конфигурация энд-поинтов и общих ресурсов
     let app = Router::new()
         .route("/users", post(add_user))
+        .route("/users/:user_id", put(update_user))
+        .route("/users/:user_id", delete(delete_user))
+        .route("/products", post(add_product))
+        .route("/products/:product_id", put(update_product))
+        .route("/products/:product_id", delete(delete_product))
         .with_state(app_state);
 
     // старт сервера на порту 3000
