@@ -1,0 +1,16 @@
+[package]
+name = "t7"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+uuid = { version = "1.10.0", features = ["serde", "v4"] }
+serde_json = "1.0.127"
+tokio = { version = "1.40.0", features = ["rt", "rt-multi-thread", "macros"] }
+deadpool-redis = { version = "0.18.0", features = ["serde"] }
+axum = "0.7.5"
+tracing = "0.1.40"
+tracing-subscriber = "0.3.18"
+dotenv = "0.15.0"
+dashmap = "6.1.0"
+serde = "1.0.213"
