@@ -5,7 +5,7 @@ use std::sync::Arc;
 use uuid::Uuid;
 use crate::AppState;
 use crate::errors::ServerError;
-use crate::modules::event_manager::Event;
+use crate::modules::event_manager::EventPayload;
 
 // POST /subscriptions/:user_uuid/:event_type - подписка пользователя на событие определённого типа
 pub async fn subscribe(
@@ -32,7 +32,7 @@ pub async fn get_subscriptions_by_user_uuid(
 // POST /subscriptions/:user_uuid/:event_type - подписка пользователя на событие определённого типа
 pub async fn add_event(
     State(app_state): State<Arc<AppState>>,
-    Json(event) : Json<Event>
+    Json(event) : Json<EventPayload>
 ) -> Result<(), ServerError> {
     // получение всех заказов из базы данных
     app_state.event_manager.add_event(event).await?;

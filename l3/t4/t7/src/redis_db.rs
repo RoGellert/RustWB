@@ -4,7 +4,7 @@ use deadpool_redis::redis::{AsyncCommands};
 use deadpool_redis::{ Config, CreatePoolError, Pool, Runtime};
 use std::error::Error;
 use uuid::Uuid;
-use crate::modules::event_manager::Event;
+use crate::modules::event_manager::{Event, EventPayload};
 
 // обёртка вокруг пула подключений
 pub struct RedisDB {
@@ -67,7 +67,7 @@ impl RedisDB {
 
         // получение всех ивентов по категории
         let events: Vec<String> =
-            conn.lrange(format!("{}:subscriptions", &category), 0, -1).await?;
+            conn.lrange(format!("events:{}", &category), 0, -1).await?;
 
         if events.is_empty() {
             return Ok(None)

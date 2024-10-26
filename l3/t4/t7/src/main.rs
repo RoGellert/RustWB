@@ -44,6 +44,7 @@ async fn main() {
         .await
         .expect("не удалось подключится к базе данных"));
 
+    // создание мэнеджеров
     let subscription_manager = Arc::new(SubscriptionManager::new(Arc::clone(&redis_db)));
     let event_manager = EventManager::new(Arc::clone(&redis_db), Arc::clone(&subscription_manager));
 

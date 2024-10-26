@@ -13,9 +13,26 @@ pub struct EventManager {
 
 // стуктрура события
 #[derive(Debug, Serialize, Deserialize)]
-pub struct Event {
+pub struct EventPayload {
     pub event_type: String,
     pub event_name: String
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Event {
+    pub event_uuid: Uuid,
+    pub event_type: String,
+    pub event_name: String
+}
+
+impl Event {
+    pub fn from_payload(event_payload: EventPayload) -> Self {
+        Event {
+            event_uuid: Uuid::new_v4(),
+            event_name: event_payload.event_name,
+            event_type: event_payload.event_type
+        }
+    }
 }
 
 impl EventManager {
@@ -24,7 +41,8 @@ impl EventManager {
     }
 
     // добавление нового ивента в базу и нотификация
-    pub async fn add_event(&self, event: Event) -> Result<(), ServerError> {
+    pub async fn add_event(&self, event_payload: EventPayload) -> Result<(), ServerError> {
+        let event = Event::from_payload(event_payload);
         // сериализация
         let event_serialised = serde_json::to_string_pretty(&event).map_err(|_| ServerError::Serialisation(format!("не удалось сериализовать : {:?}", event)))?;
 
