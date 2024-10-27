@@ -93,7 +93,7 @@ impl EventManager {
             .get_all_subscriptions_by_user_uuid(user_uuid)
             .await?;
 
-        // получение ивентов из базы
+        // получение событий из базы
         let mut event_strings: Vec<String> = Vec::new();
         for subscription in subscriptions {
             if let Ok(Some(events)) = self.redis_db.get_events_by_category(subscription).await {

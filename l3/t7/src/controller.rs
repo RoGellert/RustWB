@@ -37,7 +37,7 @@ pub async fn get_subscriptions_by_user_uuid(
     Ok(Json(subscriptions))
 }
 
-// POST /subscriptions/:user_uuid/:event_type - подписка пользователя на событие определённого типа
+// POST /events - добавление нового ивента
 pub async fn add_event(
     State(app_state): State<Arc<AppState>>,
     Json(event): Json<EventPayload>,
@@ -48,7 +48,7 @@ pub async fn add_event(
     Ok(())
 }
 
-// GET - получение ивентов на которые подписан пользователь по uuid
+// GET /events/:user_uuid - получение ивентов на которые подписан пользователь по uuid
 pub async fn get_events_by_user_uuid(
     State(app_state): State<Arc<AppState>>,
     Path(user_uuid): Path<Uuid>,
@@ -62,7 +62,7 @@ pub async fn get_events_by_user_uuid(
     Ok(Json(events))
 }
 
-// хэндлер WebSocket
+// GET /notifications/:user_uuid - хэндлер WebSocket для нотификаций
 pub async fn notification_socket_handler(
     ws: WebSocketUpgrade,
     State(app_state): State<Arc<AppState>>,
