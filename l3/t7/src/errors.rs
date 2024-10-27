@@ -4,11 +4,14 @@ use std::error::Error;
 use tracing::error;
 
 // потенциальные ошибки
+#[derive(Debug)]
 pub enum ServerError {
     Redis(Box<dyn Error>),
     NotFound(String),
     BusinessLogic(String),
     Serialisation(String),
+    Broadcast(String),
+    WebSocket(String),
 }
 
 // для обработки потенциальных ошибок сервером Axum
@@ -44,6 +47,22 @@ impl IntoResponse for ServerError {
                 (
                     StatusCode::INTERNAL_SERVER_ERROR,
                     format!("Ошибка сериализации: {:?}", text),
+                )
+                    .into_response()
+            }
+            ServerError::Broadcast(text) => {
+                error!("Ошибка канала вещания: {:?}", text);
+                (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    format!("Ошибка канала вещания: {:?}", text),
+                )
+                    .into_response()
+            }
+            ServerError::WebSocket(text) => {
+                error!("Ошибка WebSocket: {:?}", text);
+                (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    format!("Ошибка WebSocket: {:?}", text),
                 )
                     .into_response()
             }

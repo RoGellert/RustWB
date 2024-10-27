@@ -8,9 +8,12 @@ uuid = { version = "1.10.0", features = ["serde", "v4"] }
 serde_json = "1.0.127"
 tokio = { version = "1.40.0", features = ["rt", "rt-multi-thread", "macros"] }
 deadpool-redis = { version = "0.18.0", features = ["serde"] }
-axum = "0.7.5"
+axum =  { version = "0.7.5", features = ["ws"] }
 tracing = "0.1.40"
 tracing-subscriber = "0.3.18"
+tower-cookies = "0.10.0"
 dotenv = "0.15.0"
 dashmap = "6.1.0"
 serde = "1.0.213"
+redis = { version = "0.27.5", features = ["aio", "tokio-comp", "connection-manager"] }
+futures-util = "0.3.31"
