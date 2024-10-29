@@ -1,0 +1,13 @@
+[package]
+name = "task_creator"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+axum = "0.7.7"
+uuid = { version = "1.10.0", features = ["serde", "v4"] }
+serde_json = "1.0.127"
+serde = { version = "1.0.209", features = ["derive"] }
+tracing = "0.1.40"
+tracing-subscriber = "0.3.18"
+tokio = { version = "1.41.0", features = ["rt", "rt-multi-thread", "macros"] }
