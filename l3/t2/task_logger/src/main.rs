@@ -95,7 +95,7 @@ fn main() {
     let file = fs::OpenOptions::new()
         .create(true)
         .append(true)
-        .open("../data/log.json").expect("не удалось создать файл для логов");
+        .open("../data/logs.jsonl").expect("не удалось создать файл для логов");
 
     info!("начало создания логов обработанных задач");
 
