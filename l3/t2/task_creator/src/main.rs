@@ -10,14 +10,14 @@ use uuid::Uuid;
 #[derive(Serialize, Deserialize)]
 struct TaskPayload {
     pub task_name: String,
-    pub duration: u32
+    pub duration: u64
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 struct Task {
     pub task_uuid: Uuid,
     pub task_name: String,
-    pub duration: u32
+    pub duration: u64
 }
 
 impl Task {
