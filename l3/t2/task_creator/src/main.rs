@@ -9,15 +9,16 @@ use uuid::Uuid;
 
 #[derive(Serialize, Deserialize)]
 struct TaskPayload {
-    pub task_name: String,
-    pub duration: u64
+    pub task_type: String, // тип задания
+    pub n: usize,          // входной n
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+// стуктрура задачи
+#[derive(Debug, Serialize, Deserialize)]
 struct Task {
     pub task_uuid: Uuid,
-    pub task_name: String,
-    pub duration: u64
+    pub task_type: String, // тип задания
+    pub n: usize,          // входной n
 }
 
 impl Task {
@@ -25,8 +26,8 @@ impl Task {
         let task_uuid = Uuid::new_v4();
         Task {
             task_uuid,
-            task_name: task_payload.task_name,
-            duration: task_payload.duration
+            task_type: task_payload.task_type,
+            n: task_payload.n
         }
     }
 }
@@ -35,7 +36,8 @@ impl Task {
 #[derive(Debug)]
 pub enum ServerError {
     Serialisation(String),
-    FileSystem(String)
+    FileSystem(String),
+    Validation(String),
 }
 
 
@@ -58,6 +60,14 @@ impl IntoResponse for ServerError {
                     format!("Ошибка сериализации {:?}", err),
                 )
                     .into_response()
+            },
+            ServerError::Validation(err) => {
+                error!("Неправильный тип задачи {:?}", err);
+                (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    format!("Неправильный тип задачи {:?}", err),
+                )
+                    .into_response()
             }
         }
     }
@@ -65,6 +75,14 @@ impl IntoResponse for ServerError {
 
 // создание новой задачи при запросе в веб-сервер
 async fn create_task(Json(task_payload): Json<TaskPayload>) -> Result<(), ServerError> {
+    // возможные типы
+    let possible_types = ["fibonnaci", "tribonnaci" , "sum_of_square_roots", "sum_of_squares", "sleep"];
+
+    // валидация типа задачи
+    if !possible_types.contains(&task_payload.task_type.as_str()) {
+        return Err(ServerError::Validation(format!("Неверный тип задачи: {}, возможные типы: {:?}", &task_payload.task_type, possible_types)))
+    };
+
     // преобразование содержимого Body в Task
     let new_task = Task::from_payload(task_payload);
 
